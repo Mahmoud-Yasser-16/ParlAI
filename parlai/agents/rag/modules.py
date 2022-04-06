@@ -311,13 +311,16 @@ class RagModel(TorchGeneratorModel):
         """
         # 1. Retrieve
         top_docs, top_doc_scores = self.retriever.retrieve(query_vec)
-
+        print("\ninput:\n",input, "\ninput_lengths:\n",input_lengths, "\ntop_docs:\n",top_docs, "\ntop_doc_scores.size(1):\n",top_doc_scores.size(1))
+        print("input_turns_cnt: ",input_turns_cnt)
         # 2. Expand the input
         if input_turns_cnt is not None:
             input = input.repeat_interleave(input_turns_cnt, dim=0)  # type: ignore
             input_lengths = input_lengths.repeat_interleave(
                 input_turns_cnt, dim=0
             )  # type: ignore
+        print("input to concat_docs_and_input")
+        print("\ninput:\n",input, "\ninput_lengths:\n",input_lengths, "\ntop_docs:\n",top_docs, "\ntop_doc_scores.size(1):\n",top_doc_scores.size(1))
         expanded_input = self.concat_docs_and_input(
             input, input_lengths, top_docs, top_doc_scores.size(1)
         )
