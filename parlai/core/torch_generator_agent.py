@@ -882,9 +882,14 @@ class TorchGeneratorAgent(TorchAgent, ABC):
         else:
             maxlen = self.label_truncate or 256
             prefix_tokens = self.get_prefix_tokens(batch)
-            beam_preds_scores, beams = self._generate(
-                batch, self.beam_size, maxlen, prefix_tokens=prefix_tokens ,docs_info=docs_info
-            )
+            try:
+                beam_preds_scores, beams = self._generate(
+                    batch, self.beam_size, maxlen, prefix_tokens=prefix_tokens ,docs_info=docs_info
+                )
+            except:
+                beam_preds_scores, beams = self._generate(
+                    batch, self.beam_size, maxlen, prefix_tokens=prefix_tokens 
+                )
             preds, _, _ = zip(*beam_preds_scores)
             self._add_generation_metrics(batch, preds)
 
