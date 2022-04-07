@@ -738,8 +738,6 @@ class SeekerAgent(Agent):
                     if i in search_indices
                 ] ,docs_info
             )
-            print("search_replies: ")
-            print(search_replies)
             self.knowledge_agent.beam_min_length = old_min_length
             non_search_replies = (
                 self.knowledge_agent.batch_act(
@@ -833,54 +831,23 @@ class SeekerAgent(Agent):
         """
         knowledge_agent_observations = [o['knowledge_agent'] for o in observations]
         # First, determine whether we're searching
-        print ("="*90)
-        print ( "input to search decision:")
-        print("observations: ",observations)
-        print("knowledge_agent_observations: ", knowledge_agent_observations)
         batch_reply_sdm, search_indices, knowledge_agent_observations = self.batch_act_sdm(
             observations, knowledge_agent_observations
         )
-        print ("="*40)
-        print ( "output from search decision:")
-        print("batch_reply_sdm: ",batch_reply_sdm)
-        print("search_indices: ",search_indices)
-        print("knowledge_agent_observations: ", knowledge_agent_observations)
         
 
-        print ("="*90)
-        print ( "input to query generator: ")
-        print("observations: ",observations)
-        print("search_indices: ", search_indices)
         # Second, generate search queries
         batch_reply_sqm = self.batch_act_sqm(observations, search_indices)
-        print ("="*40)
-        print ( "output from query generator:")
-        print("batch_reply_sqm: ",batch_reply_sqm)
         
-        print ("="*90)
-        print ( "input to knowledge generator: ")
-        print("observations: ",observations)
-        print("search_indices: ", search_indices)
-        print("knowledge_agent_observations: ", knowledge_agent_observations)
         # Third, generate the knowledge sentence
         batch_reply_krm = self.batch_act_krm(
             observations, knowledge_agent_observations, search_indices ,docs_info
         )
-        print ("="*40)
-        print ( "output from search decision:")
-        print("batch_reply_krm: ",batch_reply_krm)
 
 
-        print ("="*90)
-        print ( "input to knowledge generator: ")
-        print("observations: ",observations)
-        print("batch_reply_krm: ", batch_reply_krm)
 
         # Fourth, generate the dialogue response!
         batch_reply_drm = self.batch_act_drm(observations, batch_reply_krm)
-        print ("="*40)
-        print ( "output from search decision:")
-        print("batch_reply_drm: ",batch_reply_drm)
 
         # Finaly, combine them all in the drm batch reply.
         for sdm, sqm, krm, drm in zip(
