@@ -665,6 +665,7 @@ class RagAgent(TransformerGeneratorRagAgent, BartRagAgent, T5RagAgent):
         beam_size: int,
         max_ts: int,
         prefix_tokens: Optional[torch.LongTensor] = None,
+        docs_info=[]
     ) -> Tuple[
         List[Tuple[torch.LongTensor, torch.Tensor, Optional[Dict]]], List[TreeSearch]
     ]:
@@ -675,13 +676,13 @@ class RagAgent(TransformerGeneratorRagAgent, BartRagAgent, T5RagAgent):
         """
         if self.regret:
             beam_preds_scores, _ = self._regret_generate(
-                batch, beam_size, self.regret_intermediate_maxlen, prefix_tokens
+                batch, beam_size, self.regret_intermediate_maxlen, prefix_tokens,docs_info=docs_info
             )
             preds, _, _ = zip(*beam_preds_scores)
             new_batch = self._regret_rebatchify(batch, preds)  # type: ignore
-            gen_outs = self._rag_generate(new_batch, beam_size, max_ts, prefix_tokens)
+            gen_outs = self._rag_generate(new_batch, beam_size, max_ts, prefix_tokens,docs_info=docs_info)
         else:
-            gen_outs = self._rag_generate(batch, beam_size, max_ts, prefix_tokens)
+            gen_outs = self._rag_generate(batch, beam_size, max_ts, prefix_tokens,docs_info=docs_info)
 
         return gen_outs
 
@@ -715,6 +716,7 @@ class RagAgent(TransformerGeneratorRagAgent, BartRagAgent, T5RagAgent):
         beam_size: int,
         max_ts: int,
         prefix_tokens: Optional[torch.LongTensor] = None,
+        docs_info=[]
     ) -> Tuple[
         List[Tuple[torch.LongTensor, torch.Tensor, Optional[Dict]]], List[TreeSearch]
     ]:
@@ -725,7 +727,7 @@ class RagAgent(TransformerGeneratorRagAgent, BartRagAgent, T5RagAgent):
             batch, self.model
         )
         return self._generation_agent._generate(
-            self, batch, beam_size, max_ts, prefix_tokens
+            self, batch, beam_size, max_ts, prefix_tokens,docs_info=docs_info
         )
 
     def _regret_generate(
