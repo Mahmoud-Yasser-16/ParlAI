@@ -852,7 +852,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
 
         return cand_choices, cand_choices_scores
 
-    def eval_step(self, batch):
+    def eval_step(self, batch,docs_info=[]):
         """
         Evaluate a single batch of examples.
         """
@@ -883,7 +883,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
             maxlen = self.label_truncate or 256
             prefix_tokens = self.get_prefix_tokens(batch)
             beam_preds_scores, beams = self._generate(
-                batch, self.beam_size, maxlen, prefix_tokens=prefix_tokens
+                batch, self.beam_size, maxlen, prefix_tokens=prefix_tokens ,docs_info=docs_info
             )
             preds, _, _ = zip(*beam_preds_scores)
             self._add_generation_metrics(batch, preds)
@@ -1102,7 +1102,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
         batch: Batch,
         beam_size: int,
         max_ts: int,
-        prefix_tokens: Optional[torch.LongTensor] = None,
+        prefix_tokens: Optional[torch.LongTensor] = None, docs_info =[]
     ):
         """
         Generate an output with beam search.
@@ -1129,7 +1129,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
         model = self.model
         if isinstance(model, torch.nn.parallel.DistributedDataParallel):
             model = self.model.module
-        encoder_states = model.encoder(*self._encoder_input(batch))
+        encoder_states = model.encoder(*self._encoder_input(batch),docs_info)
         if batch.text_vec is not None:
             dev = batch.text_vec.device
         else:

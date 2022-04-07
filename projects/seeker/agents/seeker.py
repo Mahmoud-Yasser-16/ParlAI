@@ -146,11 +146,11 @@ class ComboFidAgent(FidAgent):
             return []
         return super().get_retrieved_knowledge(message)
 
-    def eval_step(self, batch: Batch) -> Optional[Output]:
+    def eval_step(self, batch: Batch, docs_info=[]) -> Optional[Output]:
         """
         Add top documents to the output.
         """
-        output = TorchGeneratorAgent.eval_step(self, batch)
+        output = TorchGeneratorAgent.eval_step(self, batch,docs_info)
         if output is not None and not self.opt.get('serializable', False):
             output.top_docs = self.model_api.get_top_docs()
         return output
@@ -709,7 +709,7 @@ class SeekerAgent(Agent):
         self,
         observations: List[Dict[str, Message]],
         knowledge_agent_observations: List[Message],
-        search_indices: List[int]
+        search_indices: List[int] ,docs_info=[]
     ) -> List[Message]:
         """
         Knowledge Response Model batch act.
@@ -736,7 +736,7 @@ class SeekerAgent(Agent):
                     o
                     for i, o in enumerate(knowledge_agent_observations)
                     if i in search_indices
-                ]
+                ] ,docs_info
             )
             print("search_replies: ")
             print(search_replies)
@@ -821,7 +821,7 @@ class SeekerAgent(Agent):
 
         return batch_reply_drm
 
-    def batch_act(self, observations: List[Dict[str, Message]]) -> List[Message]:
+    def batch_act(self, observations: List[Dict[str, Message]],docs_info=[]) -> List[Message]:
         """
         Full batch_act pipeline.
 
@@ -864,7 +864,7 @@ class SeekerAgent(Agent):
         print("knowledge_agent_observations: ", knowledge_agent_observations)
         # Third, generate the knowledge sentence
         batch_reply_krm = self.batch_act_krm(
-            observations, knowledge_agent_observations, search_indices
+            observations, knowledge_agent_observations, search_indices ,docs_info
         )
         print ("="*40)
         print ( "output from search decision:")
@@ -898,11 +898,11 @@ class SeekerAgent(Agent):
 
         return batch_reply_drm
 
-    def act(self):
+    def act(self,docs_info=[]):
         """
         Call batch_act with the singleton batch.
         """
-        response = self.batch_act([self.observations])[0]
+        response = self.batch_act([self.observations],docs_info)[0]
         self.self_observe(response)
         return response
 

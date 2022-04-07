@@ -198,6 +198,7 @@ class ComboFidModel(FidModel):
         skip_retrieval_vec: torch.BoolTensor,
         positions: Optional[torch.LongTensor] = None,
         segments: Optional[torch.LongTensor] = None,
+        docs_info=[]
     ) -> Tuple[
         torch.Tensor,
         torch.BoolTensor,
@@ -236,7 +237,7 @@ class ComboFidModel(FidModel):
             return new_out, new_mask, None, None, None
         elif torch.all(~skip_retrieval_vec):
             output = super().encoder(
-                input, input_lengths, query_vec, input_turns_cnt, positions, segments
+                input, input_lengths, query_vec, input_turns_cnt, positions, segments, docs_info=docs_info
             )
             self.top_docs = output[-2]
             return output
@@ -252,6 +253,7 @@ class ComboFidModel(FidModel):
             input_turns_cnt,
             positions,
             segments,
+            docs_info=docs_info
         )
         # Encode with seq2seq_encoder for skip-retrieval inputs
         enc_out_skip_retrieval, mask_skip_retrieval = self.seq2seq_encoder(

@@ -120,6 +120,7 @@ class FidModel(RagModel):
         input_turns_cnt: torch.LongTensor,
         positions: Optional[torch.LongTensor] = None,
         segments: Optional[torch.LongTensor] = None,
+        docs_info=[]
     ) -> Tuple[
         torch.Tensor,
         torch.BoolTensor,
@@ -147,7 +148,7 @@ class FidModel(RagModel):
             top_doc_scores: scores for each retrieved document.
         """
         enc_out, mask, input_turns_cnt, top_docs, top_doc_scores = super().encoder(
-            input, input_lengths, query_vec, input_turns_cnt, positions, segments
+            input, input_lengths, query_vec, input_turns_cnt, positions, segments , docs_info= docs_info
         )  # type: ignore
 
         if input_turns_cnt is not None:

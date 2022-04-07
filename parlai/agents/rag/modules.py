@@ -145,6 +145,7 @@ class RagModel(TorchGeneratorModel):
         input_turns_cnt: torch.LongTensor,
         positions: Optional[torch.LongTensor] = None,
         segments: Optional[torch.LongTensor] = None,
+        docs_info=[]
     ) -> Tuple[
         torch.Tensor,
         torch.BoolTensor,
@@ -176,7 +177,7 @@ class RagModel(TorchGeneratorModel):
         # Retrieve, get expanded input
         if all([tensor is not None for tensor in [input_lengths, query_vec]]):
             expanded_input, top_docs, top_doc_scores = self.retrieve_and_concat(
-                input, input_lengths, query_vec, input_turns_cnt
+                input, input_lengths, query_vec, input_turns_cnt , docs_info=docs_info
             )
         else:
             expanded_input = input
@@ -291,6 +292,7 @@ class RagModel(TorchGeneratorModel):
         input_lengths: torch.LongTensor,
         query_vec: torch.LongTensor,
         input_turns_cnt: torch.LongTensor,
+        docs_info=[]
     ) -> Tuple[torch.LongTensor, List[List[Document]], torch.Tensor]:
         """
         Retrieve documents, concat with input.
@@ -310,8 +312,12 @@ class RagModel(TorchGeneratorModel):
             top_doc_scores: document scores for each document
         """
         # 1. Retrieve
-        top_docs, top_doc_scores = self.retriever.retrieve(query_vec)
-        print("\ninput:\n",input, "\ninput_lengths:\n",input_lengths, "\ntop_docs:\n",top_docs, "\ntop_doc_scores.size(1):\n",top_doc_scores.size(1))
+        if not docs_info:
+            top_docs, top_doc_scores = self.retriever.retrieve(query_vec)
+        else: 
+            top_docs= docs_info[0]
+            top_doc_scores = docs_info[1]
+        print("\ninput:\n",input, "\ninput_lengths:\n",input_lengths, "\ntop_docs:\n",top_docs, "\ntop_doc_scores.size(1):\n",top_doc_scores)
         print("input_turns_cnt: ",input_turns_cnt)
         # 2. Expand the input
         if input_turns_cnt is not None:

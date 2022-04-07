@@ -2148,7 +2148,7 @@ class TorchAgent(ABC, Agent):
         self.self_observe(response)
         return response
 
-    def batch_act(self, observations):
+    def batch_act(self, observations, docs_info=[]):
         """
         Process a batch of observations (batchsize list of message dicts).
 
@@ -2240,7 +2240,7 @@ class TorchAgent(ABC, Agent):
             with torch.no_grad():
                 # save memory and compute by disabling autograd.
                 # use `with torch.enable_grad()` to gain back gradients.
-                output = self.eval_step(batch)
+                output = self.eval_step(batch,docs_info)
 
         if output is not None:
             # local metrics are automatically matched up
