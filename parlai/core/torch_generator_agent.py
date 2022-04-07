@@ -1134,7 +1134,7 @@ class TorchGeneratorAgent(TorchAgent, ABC):
         model = self.model
         if isinstance(model, torch.nn.parallel.DistributedDataParallel):
             model = self.model.module
-        encoder_states = model.encoder(*self._encoder_input(batch),docs_info)
+        encoder_states = model.encoder(*self._encoder_input(batch),docs_info=docs_info)
         if batch.text_vec is not None:
             dev = batch.text_vec.device
         else:
