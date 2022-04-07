@@ -709,7 +709,7 @@ class SeekerAgent(Agent):
         self,
         observations: List[Dict[str, Message]],
         knowledge_agent_observations: List[Message],
-        search_indices: List[int],
+        search_indices: List[int]
     ) -> List[Message]:
         """
         Knowledge Response Model batch act.
@@ -738,6 +738,8 @@ class SeekerAgent(Agent):
                     if i in search_indices
                 ]
             )
+            print("search_replies: ")
+            print(search_replies)
             self.knowledge_agent.beam_min_length = old_min_length
             non_search_replies = (
                 self.knowledge_agent.batch_act(
