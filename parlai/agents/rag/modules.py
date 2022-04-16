@@ -313,7 +313,9 @@ class RagModel(TorchGeneratorModel):
         """
         # 1. Retrieve
         if not docs_info:
-            top_docs, top_doc_scores = self.retriever.retrieve(query_vec)
+            # top_docs, top_doc_scores = self.retriever.retrieve(query_vec)
+            top_docs=[[]]
+            top_doc_scores=[[]]
         else: 
             top_docs= docs_info[0]
             top_doc_scores = docs_info[1]
